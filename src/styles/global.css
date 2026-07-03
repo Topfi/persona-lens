@@ -1,0 +1,323 @@
+:root {
+  /* Risograph print palette — two inks on warm paper.
+     Mark colors (--data, --accent-dim) validated for contrast/CVD on this surface. */
+  --ink-0: #f4efe6; /* paper */
+  --ink-1: #f4efe6; /* panel (flat; borders do the work) */
+  --ink-2: #e9e2d2; /* raised / tracks */
+  --ink-3: #2f4daa; /* borders = riso blue ink */
+  --paper: #232633;
+  --text-0: #232633; /* blue-black ink */
+  --text-1: #3d4460;
+  --muted: #6b7188;
+  --accent: #c74e2d; /* fluoro red-orange ink */
+  --accent-dim: #c74e2d;
+  --data: #2f4daa; /* riso blue ink */
+  --data-soft: rgba(47, 77, 170, 0.15);
+  --on-accent: #fff8ec;
+  --danger: #b3372e;
+  --ok: #3e7d4f;
+
+  --field-bg: #fdfaf3;
+  --shadow-ink: rgba(47, 77, 170, 0.28);
+  --shadow-accent: rgba(199, 78, 45, 0.3);
+  --misreg: rgba(199, 78, 45, 0.55);
+
+  --font-display: "Archivo Black", "Archivo", sans-serif;
+  --font-body: "Archivo", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  --radius: 2px;
+  --pad: clamp(16px, 3vw, 32px);
+}
+
+/* --- dark mode: night-print riso (validated marks on #191c28) ----------- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-mode="light"]) {
+    color-scheme: dark;
+    --ink-0: #191c28;
+    --ink-1: #191c28;
+    --ink-2: #242838;
+    --ink-3: #6e88e0;
+    --paper: #e8e6dd;
+    --text-0: #e8e6dd;
+    --text-1: #b8b6ac;
+    --muted: #8c8b84;
+    --accent: #e0794f;
+    --accent-dim: #d06a40;
+    --data: #6e88e0;
+    --data-soft: rgba(110, 136, 224, 0.2);
+    --on-accent: #1c0f08;
+    --danger: #e06c5a;
+    --ok: #6fb27f;
+    --field-bg: #12141d;
+    --shadow-ink: rgba(110, 136, 224, 0.3);
+    --shadow-accent: rgba(224, 121, 79, 0.35);
+    --misreg: rgba(224, 121, 79, 0.5);
+  }
+}
+
+:root[data-mode="dark"] {
+  color-scheme: dark;
+  --ink-0: #191c28;
+  --ink-1: #191c28;
+  --ink-2: #242838;
+  --ink-3: #6e88e0;
+  --paper: #e8e6dd;
+  --text-0: #e8e6dd;
+  --text-1: #b8b6ac;
+  --muted: #8c8b84;
+  --accent: #e0794f;
+  --accent-dim: #d06a40;
+  --data: #6e88e0;
+  --data-soft: rgba(110, 136, 224, 0.2);
+  --on-accent: #1c0f08;
+  --danger: #e06c5a;
+  --ok: #6fb27f;
+  --field-bg: #12141d;
+  --shadow-ink: rgba(110, 136, 224, 0.3);
+  --shadow-accent: rgba(224, 121, 79, 0.35);
+  --misreg: rgba(224, 121, 79, 0.5);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  background: var(--ink-0);
+  color: var(--text-0);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Heavy print grain — the riso texture */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1000;
+  opacity: 0.09;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+h1 {
+  text-transform: uppercase;
+  /* ink misregistration */
+  text-shadow: 3px 2px 0 var(--misreg);
+}
+
+h2 {
+  text-transform: uppercase;
+  font-size: 20px;
+}
+
+a {
+  color: var(--accent);
+  text-decoration-color: color-mix(in oklab, var(--accent) 50%, transparent);
+  text-underline-offset: 3px;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  background: var(--ink-2);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+}
+
+::selection {
+  background: color-mix(in oklab, var(--accent) 35%, transparent);
+}
+
+.shell {
+  max-width: 1060px;
+  margin: 0 auto;
+  padding: 0 var(--pad) 96px;
+}
+
+/* --- shared primitives -------------------------------------------------- */
+
+.kicker {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.kicker--accent {
+  color: var(--accent);
+}
+
+.panel {
+  background: var(--ink-1);
+  border: 2px solid var(--data);
+  border-radius: var(--radius);
+  padding: var(--pad);
+  box-shadow: 5px 5px 0 var(--shadow-ink);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field > label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-1);
+}
+
+input[type="text"],
+input[type="password"],
+input[type="number"],
+select {
+  font: inherit;
+  color: var(--text-0);
+  background: var(--field-bg);
+  border: 2px solid var(--data);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  outline: none;
+  transition: border-color 120ms ease;
+}
+
+input:focus,
+select:focus {
+  border-color: var(--accent);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 2px solid var(--data);
+  border-radius: var(--radius);
+  background: var(--ink-1);
+  color: var(--text-0);
+  padding: 10px 18px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  box-shadow: 3px 3px 0 var(--shadow-ink);
+  transition: transform 100ms ease, box-shadow 100ms ease, border-color 120ms ease, background 120ms ease;
+}
+
+.btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 var(--shadow-accent);
+}
+
+.btn:active:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--shadow-ink);
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn--primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+  font-weight: 600;
+  box-shadow: 3px 3px 0 var(--shadow-ink);
+}
+
+.btn--primary:hover:not(:disabled) {
+  background: color-mix(in oklab, var(--accent) 88%, white);
+}
+
+.btn--ghost {
+  background: transparent;
+  box-shadow: none;
+  border-width: 1px;
+  border-color: color-mix(in oklab, var(--data) 45%, transparent);
+}
+
+.seg {
+  display: inline-flex;
+  border: 2px solid var(--data);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--field-bg);
+}
+
+.seg > button {
+  border: none;
+  background: transparent;
+  color: var(--text-1);
+  padding: 9px 16px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  border-right: 1px solid color-mix(in oklab, var(--data) 40%, transparent);
+}
+
+.seg > button:last-child {
+  border-right: none;
+}
+
+.seg > button[aria-pressed="true"] {
+  background: var(--data);
+  color: var(--on-accent);
+}
+
+.error-box {
+  border: 2px solid var(--danger);
+  background: color-mix(in oklab, var(--danger) 8%, var(--ink-1));
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  box-shadow: 5px 5px 0 color-mix(in oklab, var(--danger) 28%, transparent);
+}
+
+.error-box strong {
+  color: var(--danger);
+}
+
+/* Entrance motion: transform only — content must never depend on an
+   animation having run to be visible (paused/background tabs, printing). */
+@keyframes rise {
+  from {
+    transform: translateY(12px);
+  }
+  to {
+    transform: none;
+  }
+}
+
+.rise {
+  animation: rise 480ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise {
+    animation: none;
+  }
+}

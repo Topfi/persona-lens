@@ -1,0 +1,250 @@
+import type { RawItem } from "../platforms/types";
+import type { LLMProvider, ModelInfo } from "../providers/types";
+import { ProviderError } from "../providers/types";
+import type { AssessmentDoc, PlatformId } from "../schema/assessment";
+import { assessmentDocSchema, SCHEMA_VERSION } from "../schema/assessment";
+import { chunkItems } from "./chunker";
+import { activityByMonth, countsByKind, dateRange, wordCloud } from "./localStats";
+import {
+  ANALYST_LENSES,
+  analystPrompt,
+  quickSynthesisUser,
+  readerPrompt,
+  READER_SCHEMA,
+  synthesisPrompt,
+  SYNTHESIS_SCHEMA,
+  type Depth,
+} from "./prompts";
+import { costUsd } from "../providers/pricing";
+
+export interface PipelineConfig {
+  provider: LLMProvider;
+  models: { reader: ModelInfo; analyst: ModelInfo; synthesis: ModelInfo };
+  depth: Depth;
+  platform: PlatformId;
+  username: string;
+  concurrency?: number;
+  targetChunkTokens?: number;
+  signal: AbortSignal;
+  onProgress: (p: PipelineProgress) => void;
+}
+
+export interface PipelineProgress {
+  phase: "chunking" | "reading" | "analyzing" | "synthesizing" | "done";
+  chunksDone?: number;
+  chunksTotal?: number;
+  tokensIn: number;
+  tokensOut: number;
+  costSoFar?: number;
+  streamPreview?: string;
+}
+
+const MAX_RETRIES = 4;
+
+async function withRetry<T>(fn: () => Promise<T>, signal: AbortSignal): Promise<T> {
+  let lastErr: unknown;
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      return await fn();
+    } catch (e) {
+      lastErr = e;
+      if (signal.aborted) throw e;
+      const retryable = e instanceof ProviderError && e.retryable;
+      if (!retryable || attempt === MAX_RETRIES) throw e;
+      const backoff =
+        (e instanceof ProviderError && e.retryAfterMs) || Math.min(30_000, 1500 * 2 ** attempt) * (0.5 + Math.random());
+      await new Promise((r) => setTimeout(r, backoff));
+    }
+  }
+  throw lastErr;
+}
+
+/** Simple concurrency pool preserving result order; failed slots become null. */
+async function pool<T, R>(items: T[], limit: number, fn: (item: T, i: number) => Promise<R>): Promise<(R | null)[]> {
+  const results: (R | null)[] = new Array(items.length).fill(null);
+  let next = 0;
+  const workers = Array.from({ length: Math.min(limit, items.length) }, async () => {
+    for (;;) {
+      const i = next++;
+      if (i >= items.length) return;
+      try {
+        results[i] = await fn(items[i], i);
+      } catch {
+        results[i] = null; // skip failed chunk; reported via skippedChunks
+      }
+    }
+  });
+  await Promise.all(workers);
+  return results;
+}
+
+export async function runPipeline(items: RawItem[], cfg: PipelineConfig): Promise<AssessmentDoc> {
+  const { provider, models, depth, signal } = cfg;
+  const concurrency = cfg.concurrency ?? 4;
+  let tokensIn = 0;
+  let tokensOut = 0;
+  let cost = 0;
+
+  const track = (model: ModelInfo, usage: { inputTokens: number; outputTokens: number }) => {
+    tokensIn += usage.inputTokens;
+    tokensOut += usage.outputTokens;
+    cost += costUsd(model, usage.inputTokens, usage.outputTokens) ?? 0;
+  };
+  const progress = (p: Omit<PipelineProgress, "tokensIn" | "tokensOut" | "costSoFar">) =>
+    cfg.onProgress({ ...p, tokensIn, tokensOut, costSoFar: cost });
+
+  progress({ phase: "chunking" });
+  const targetChunk = cfg.targetChunkTokens ?? Math.min(14_000, Math.floor(models.reader.ctxWindow * 0.35));
+  const chunks = chunkItems(items, targetChunk);
+  let skippedChunks = 0;
+
+  let synthesisUser: string;
+
+  if (depth === "quick") {
+    // Single pass over the most recent history that fits.
+    const budget = Math.min(150_000, Math.floor(models.synthesis.ctxWindow * 0.6));
+    let corpus = "";
+    let used = 0;
+    for (let i = chunks.length - 1; i >= 0; i--) {
+      if (used + chunks[i].estTokens > budget) break;
+      corpus = chunks[i].text + "\n" + corpus;
+      used += chunks[i].estTokens;
+    }
+    synthesisUser = quickSynthesisUser(cfg.platform, cfg.username, corpus);
+  } else {
+    // Readers
+    let done = 0;
+    progress({ phase: "reading", chunksDone: 0, chunksTotal: chunks.length });
+    const readerResults = await pool(chunks, concurrency, async (chunk) => {
+      const p = readerPrompt(cfg.platform, cfg.username, chunk.text, chunk.dateFrom, chunk.dateTo);
+      const res = await withRetry(
+        () =>
+          provider.complete(models.reader.id, {
+            system: p.system,
+            user: p.user,
+            jsonSchema: READER_SCHEMA,
+            maxTokens: 6_000,
+            signal,
+          }),
+        signal,
+      );
+      track(models.reader, res.usage);
+      done += 1;
+      progress({ phase: "reading", chunksDone: done, chunksTotal: chunks.length });
+      if (res.json == null) throw new ProviderError("Reader returned unparseable JSON");
+      return { slice: `${chunk.dateFrom}..${chunk.dateTo}`, evidence: res.json };
+    });
+    if (signal.aborted) throw new DOMException("Aborted", "AbortError");
+    const dossierEntries = readerResults.filter(Boolean);
+    skippedChunks = chunks.length - dossierEntries.length;
+    if (dossierEntries.length === 0) throw new Error("All reader calls failed — check your key, model choice and rate limits.");
+    const dossier = JSON.stringify(dossierEntries);
+
+    // Analysts (deep, fable, ultra)
+    let analyses = "";
+    if (depth === "deep" || depth === "fable" || depth === "ultra") {
+      progress({ phase: "analyzing", chunksDone: 0, chunksTotal: ANALYST_LENSES.length });
+      let analystsDone = 0;
+      const analystResults = await pool([...ANALYST_LENSES], 3, async (lens) => {
+        const p = analystPrompt(lens, cfg.platform, cfg.username, dossier);
+        const res = await withRetry(
+          () => provider.complete(models.analyst.id, { system: p.system, user: p.user, maxTokens: 4_000, signal }),
+          signal,
+        );
+        track(models.analyst, res.usage);
+        analystsDone += 1;
+        progress({ phase: "analyzing", chunksDone: analystsDone, chunksTotal: ANALYST_LENSES.length });
+        return `## ${lens.title}\n\n${res.text}`;
+      });
+      analyses = analystResults.filter(Boolean).join("\n\n");
+    }
+
+    synthesisUser = [
+      analyses ? `ANALYST REPORTS:\n${analyses}` : "",
+      `READER EVIDENCE DOSSIER (JSON):\n${dossier}`,
+    ]
+      .filter(Boolean)
+      .join("\n\n");
+  }
+
+  // Synthesis (streaming)
+  progress({ phase: "synthesizing" });
+  const sp = synthesisPrompt(cfg.platform, cfg.username, synthesisUser);
+  let preview = "";
+  const synth = await withRetry(
+    () =>
+      provider.complete(models.synthesis.id, {
+        system: sp.system,
+        user: sp.user,
+        jsonSchema: SYNTHESIS_SCHEMA,
+        maxTokens: 20_000,
+        signal,
+        onDelta: (d) => {
+          preview += d;
+          if (preview.length % 400 < d.length) progress({ phase: "synthesizing", streamPreview: preview.slice(-600) });
+        },
+      }),
+    signal,
+  );
+  track(models.synthesis, synth.usage);
+  if (synth.json == null) throw new Error("Synthesis returned unparseable JSON.");
+
+  // Merge LLM output with deterministic local fields and validate.
+  const llm = synth.json as any;
+  const counts = countsByKind(items);
+  const candidate: AssessmentDoc = {
+    schemaVersion: SCHEMA_VERSION,
+    metadata: {
+      platform: cfg.platform,
+      username: cfg.username,
+      generatedAt: new Date().toISOString(),
+      dateRange: dateRange(items),
+      counts: { ...counts, analyzedItems: items.length, skippedChunks },
+      analysis: {
+        depth,
+        provider: provider.id,
+        models: { reader: models.reader.id, analyst: models.analyst.id, synthesis: models.synthesis.id },
+        tokens: { input: tokensIn, output: tokensOut },
+        estimatedCostUsd: Number(cost.toFixed(4)),
+      },
+    },
+    essay: llm.essay,
+    emojiSummary: normalizeEmoji(llm.emojiSummary),
+    traits: (llm.traits ?? []).slice(0, 12).map((t: any) => ({ ...t, score: clamp(t.score, 0, 100) })),
+    topFives: {
+      topics: (llm.topFives?.topics ?? []).slice(0, 5),
+      characteristicQuotes: (llm.topFives?.characteristicQuotes ?? []).slice(0, 5),
+      strongestOpinions: (llm.topFives?.strongestOpinions ?? []).slice(0, 5),
+    },
+    quotes: (llm.quotes ?? []).slice(0, 40),
+    topicDistribution: normalizeDistribution(llm.topicDistribution ?? []),
+    activityByMonth: activityByMonth(items),
+    wordCloud: wordCloud(items),
+  };
+
+  const parsed = assessmentDocSchema.safeParse(candidate);
+  if (!parsed.success) {
+    throw new Error(`Assessment failed validation: ${parsed.error.issues[0]?.path.join(".")} — ${parsed.error.issues[0]?.message}`);
+  }
+  progress({ phase: "done" });
+  return parsed.data;
+}
+
+function clamp(n: number, lo: number, hi: number): number {
+  return Math.max(lo, Math.min(hi, Number(n) || 0));
+}
+
+function normalizeEmoji(list: any[]): AssessmentDoc["emojiSummary"] {
+  const items = (Array.isArray(list) ? list : []).slice(0, 5);
+  while (items.length < 5) items.push({ emoji: "❓", caption: "…" });
+  return items.map((e) => ({ emoji: String(e.emoji ?? "❓").slice(0, 16), caption: String(e.caption ?? "").slice(0, 120) || "…" }));
+}
+
+function normalizeDistribution(list: any[]): AssessmentDoc["topicDistribution"] {
+  let entries = (Array.isArray(list) ? list : [])
+    .filter((t) => t?.topic && Number(t.weight) > 0)
+    .slice(0, 12);
+  if (entries.length === 0) entries = [{ topic: "General", weight: 1 }];
+  const total = entries.reduce((s, t) => s + Number(t.weight), 0);
+  return entries.map((t) => ({ topic: String(t.topic).slice(0, 60), weight: Number((Number(t.weight) / total).toFixed(4)) }));
+}

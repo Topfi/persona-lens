@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "resolveJsonModule": true,
+    "types": []
+  },
+  "include": [
+    "./**/*.ts",
+    "./**/*.tsx",
+    "../src/lib/schema/**/*.ts",
+    "../node_modules/@cloudflare/workers-types/2023-07-01/index.d.ts"
+  ]
+}

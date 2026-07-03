@@ -1,0 +1,502 @@
+{
+  "schemaVersion": 1,
+  "metadata": {
+    "platform": "hn",
+    "username": "Topfi",
+    "generatedAt": "2026-07-03T12:00:00.000Z",
+    "dateRange": {
+      "from": "2023-06-06",
+      "to": "2026-06-26"
+    },
+    "counts": {
+      "comments": 441,
+      "posts": 12,
+      "analyzedItems": 453,
+      "skippedChunks": 0
+    },
+    "analysis": {
+      "depth": "fable",
+      "provider": "anthropic",
+      "models": {
+        "reader": "claude-fable-5",
+        "analyst": "claude-fable-5",
+        "synthesis": "claude-fable-5"
+      },
+      "tokens": {
+        "input": 380000,
+        "output": 46000
+      },
+      "estimatedCostUsd": 6.1
+    }
+  },
+  "essay": {
+    "title": "The Footnote Compulsive: an Evidence-Obsessed European Empiricist",
+    "tldr": "A meticulous, self-deprecating engineer whose defining trait is treating accuracy as a form of respect: every claim hedged, every assertion footnoted, every mistake publicly corrected. Deep expertise in LLM evaluation and Linux internals, wrapped in dry humor and an unshakeable demand that powerful companies say true things.",
+    "sections": [
+      {
+        "heading": "Who they are",
+        "markdown": "A European software developer — likely in their late twenties — writing in highly fluent but detectably non-native English. Their comments reveal a decade-plus Linux journey (*\"nothing has ever been as rock solid as Fedora Silverblue\"*), serious hands-on LLM evaluation work, and a surprising side plot involving medicine. They pay for multiple frontier AI subscriptions while simultaneously being one of the sharpest critics of AI hype on the site."
+      },
+      {
+        "heading": "How they communicate",
+        "markdown": "The defining trait — acknowledged in their own bio — is the long, heavily hedged, footnoted comment. Qualifiers like *\"in my purely subjective and very limited testing\"* precede nearly every claim, and numbered footnotes link to court PDFs, arXiv papers, and archive.org snapshots. The hedging isn't insecurity; it's principle. They publicly self-correct with unusual grace (*\"Seems I was very wrong\"*) and demand the same rigor from others: *\"If you are going to use quotation marks, please quote accurately.\"*"
+      },
+      {
+        "heading": "What they believe",
+        "markdown": "The spine of the persona is one demand: **the powerful should say true things and be accountable when they don't.** This shows up as demands for model changelogs, cancelled subscriptions over transparency failures, and memorable broadsides like *\"Can we make securities fraud properly illegal again?\"* They are an AI realist attacking both hype and dismissal — *\"AI hype very bad. AI anthropomorphism even worse.\"*"
+      },
+      {
+        "heading": "Net impression",
+        "markdown": "A rigorous, self-deprecating, evidence-obsessed interlocutor whose verbosity is the visible cost of taking accuracy — and other people — seriously. If this site had a citizenship award, they'd be on the shortlist; if it had a word count limit, they'd be its most distinguished repeat offender."
+      }
+    ]
+  },
+  "emojiSummary": [
+    {
+      "emoji": "📚",
+      "caption": "Footnotes everything, even casual replies"
+    },
+    {
+      "emoji": "🔬",
+      "caption": "Runs private LLM eval suites for fun"
+    },
+    {
+      "emoji": "🐧",
+      "caption": "A decade of Linux, immutable-distro devotee"
+    },
+    {
+      "emoji": "🇪🇺",
+      "caption": "Defends EU regulation with release-date data"
+    },
+    {
+      "emoji": "🤥",
+      "caption": "Allergic to corporate hype and dishonesty"
+    }
+  ],
+  "traits": [
+    {
+      "name": "Epistemic rigor",
+      "score": 96,
+      "evidence": "Cites primary sources compulsively; maintains contamination-aware private benchmarks; publicly self-corrects."
+    },
+    {
+      "name": "Verbosity",
+      "score": 92,
+      "evidence": "Self-admitted 'overly long and excessively hedged comments'; drafted three versions of one comment on a train ride."
+    },
+    {
+      "name": "Skepticism of hype",
+      "score": 90,
+      "evidence": "'AI hype very bad. AI anthropomorphism even worse.' Consistent across three years."
+    },
+    {
+      "name": "Fair-mindedness",
+      "score": 85,
+      "evidence": "Steelmans opponents, credits adversaries, vouches for downvoted comments, downvotes only spam."
+    },
+    {
+      "name": "Dry humor",
+      "score": 74,
+      "evidence": "'Using a full GPU purely for inference is like using a pickup truck for a track day.'"
+    },
+    {
+      "name": "Confrontationality",
+      "score": 38,
+      "evidence": "Polite but firm; anger escalates rhetorically, never abusively: 'somewhat reductive... very reductive... extremely reductive.'"
+    }
+  ],
+  "topFives": {
+    "topics": [
+      {
+        "label": "LLM evaluation",
+        "note": "Their strongest domain: private eval suites, three-run methodology, token/sec benchmarks."
+      },
+      {
+        "label": "Linux & OS internals",
+        "note": "Immutable distros, rollback mechanics, kernel build optimizations."
+      },
+      {
+        "label": "EU tech regulation",
+        "note": "Defends GDPR/DMA empirically, debunks launch-delay claims with data."
+      },
+      {
+        "label": "Consumer hardware",
+        "note": "SoC analysis, chip binning, inference silicon — well-read enthusiast depth."
+      },
+      {
+        "label": "AI industry accountability",
+        "note": "Transparency, changelogs, honest benchmarks; cancels subscriptions on principle."
+      }
+    ],
+    "characteristicQuotes": [
+      {
+        "text": "AI hype very bad. AI anthropomorphism even worse.",
+        "date": "2025-10-19",
+        "note": "The worldview in eight words."
+      },
+      {
+        "text": "I have made a commitment to reduce my overly long and excessively hedged comments on here, so, if I may: What the heck.",
+        "date": "2026-04-02",
+        "note": "Undercutting the resolution in the same sentence."
+      },
+      {
+        "text": "Can we make securities fraud properly illegal again or how many more years of this will we have to endure?",
+        "date": "2025-12-08",
+        "note": "Peak principled anger."
+      },
+      {
+        "text": "I'm mainly skeptical because I'd really love for this to be real.",
+        "date": "2024-02-09",
+        "note": "Wistful skepticism, their signature register."
+      },
+      {
+        "text": "Using a full GPU purely for inference is like using a pickup truck for a track day.",
+        "date": "2026-01-29",
+        "note": "The analogy habit."
+      }
+    ],
+    "strongestOpinions": [
+      {
+        "opinion": "AI labs must publish changelogs and disclose model changes.",
+        "confidence": "hill-to-die-on",
+        "evidence": "Cancelled paid subscriptions over transparency failures — twice."
+      },
+      {
+        "opinion": "Anthropomorphizing LLMs is worse than hyping them.",
+        "confidence": "hill-to-die-on",
+        "evidence": "Recurring position stated across three years."
+      },
+      {
+        "opinion": "EU tech regulation benefits citizens and doesn't delay launches.",
+        "confidence": "firm",
+        "evidence": "Repeatedly debunks delay claims with release-date data."
+      },
+      {
+        "opinion": "Crunch is always a management failure.",
+        "confidence": "firm",
+        "evidence": "Stated flatly and never walked back."
+      },
+      {
+        "opinion": "AGI doomerism distracts from present, regulable harms.",
+        "confidence": "firm",
+        "evidence": "Argues labs' actions reveal they don't believe their own AGI timelines."
+      }
+    ]
+  },
+  "quotes": [
+    {
+      "text": "Simply, nothing has ever been as rock solid as Fedora Silverblue",
+      "date": "2023-07-01"
+    },
+    {
+      "text": "Personally, I always view crunch on any project as a failure, most often by management.",
+      "date": "2023-07-05"
+    },
+    {
+      "text": "Where there is a 10ft wall, 12ft ladders will emerge.",
+      "date": "2023-07-04"
+    }
+  ],
+  "topicDistribution": [
+    {
+      "topic": "LLMs & AI industry",
+      "weight": 0.42
+    },
+    {
+      "topic": "Linux & desktop OS",
+      "weight": 0.15
+    },
+    {
+      "topic": "Hardware & SoCs",
+      "weight": 0.12
+    },
+    {
+      "topic": "EU regulation & law",
+      "weight": 0.1
+    },
+    {
+      "topic": "VR/AR",
+      "weight": 0.08
+    },
+    {
+      "topic": "Gaming",
+      "weight": 0.06
+    },
+    {
+      "topic": "Other",
+      "weight": 0.07
+    }
+  ],
+  "activityByMonth": [
+    {
+      "month": "2023-06",
+      "count": 14
+    },
+    {
+      "month": "2023-07",
+      "count": 11
+    },
+    {
+      "month": "2023-08",
+      "count": 3
+    },
+    {
+      "month": "2023-09",
+      "count": 6
+    },
+    {
+      "month": "2023-10",
+      "count": 8
+    },
+    {
+      "month": "2023-11",
+      "count": 7
+    },
+    {
+      "month": "2023-12",
+      "count": 4
+    },
+    {
+      "month": "2024-01",
+      "count": 12
+    },
+    {
+      "month": "2024-02",
+      "count": 9
+    },
+    {
+      "month": "2024-03",
+      "count": 5
+    },
+    {
+      "month": "2024-04",
+      "count": 4
+    },
+    {
+      "month": "2024-05",
+      "count": 6
+    },
+    {
+      "month": "2024-06",
+      "count": 2
+    },
+    {
+      "month": "2024-07",
+      "count": 5
+    },
+    {
+      "month": "2024-08",
+      "count": 3
+    },
+    {
+      "month": "2024-09",
+      "count": 2
+    },
+    {
+      "month": "2024-10",
+      "count": 9
+    },
+    {
+      "month": "2024-11",
+      "count": 10
+    },
+    {
+      "month": "2024-12",
+      "count": 5
+    },
+    {
+      "month": "2025-01",
+      "count": 8
+    },
+    {
+      "month": "2025-02",
+      "count": 7
+    },
+    {
+      "month": "2025-03",
+      "count": 4
+    },
+    {
+      "month": "2025-04",
+      "count": 9
+    },
+    {
+      "month": "2025-05",
+      "count": 6
+    },
+    {
+      "month": "2025-06",
+      "count": 7
+    },
+    {
+      "month": "2025-07",
+      "count": 12
+    },
+    {
+      "month": "2025-08",
+      "count": 16
+    },
+    {
+      "month": "2025-09",
+      "count": 11
+    },
+    {
+      "month": "2025-10",
+      "count": 18
+    },
+    {
+      "month": "2025-11",
+      "count": 8
+    },
+    {
+      "month": "2025-12",
+      "count": 9
+    },
+    {
+      "month": "2026-01",
+      "count": 13
+    },
+    {
+      "month": "2026-02",
+      "count": 10
+    },
+    {
+      "month": "2026-03",
+      "count": 7
+    },
+    {
+      "month": "2026-04",
+      "count": 19
+    },
+    {
+      "month": "2026-05",
+      "count": 21
+    },
+    {
+      "month": "2026-06",
+      "count": 17
+    }
+  ],
+  "wordCloud": [
+    {
+      "term": "model",
+      "weight": 1
+    },
+    {
+      "term": "context",
+      "weight": 0.82
+    },
+    {
+      "term": "eval",
+      "weight": 0.78
+    },
+    {
+      "term": "transparency",
+      "weight": 0.71
+    },
+    {
+      "term": "fedora",
+      "weight": 0.66
+    },
+    {
+      "term": "benchmark",
+      "weight": 0.64
+    },
+    {
+      "term": "tokens",
+      "weight": 0.61
+    },
+    {
+      "term": "hype",
+      "weight": 0.58
+    },
+    {
+      "term": "regulation",
+      "weight": 0.55
+    },
+    {
+      "term": "gdpr",
+      "weight": 0.52
+    },
+    {
+      "term": "anthropic",
+      "weight": 0.5
+    },
+    {
+      "term": "hedge",
+      "weight": 0.47
+    },
+    {
+      "term": "quantization",
+      "weight": 0.45
+    },
+    {
+      "term": "linux",
+      "weight": 0.44
+    },
+    {
+      "term": "subscription",
+      "weight": 0.41
+    },
+    {
+      "term": "footnote",
+      "weight": 0.4
+    },
+    {
+      "term": "silverblue",
+      "weight": 0.38
+    },
+    {
+      "term": "inference",
+      "weight": 0.36
+    },
+    {
+      "term": "changelog",
+      "weight": 0.35
+    },
+    {
+      "term": "skeptical",
+      "weight": 0.34
+    },
+    {
+      "term": "opus",
+      "weight": 0.32
+    },
+    {
+      "term": "reproducible",
+      "weight": 0.31
+    },
+    {
+      "term": "trackpad",
+      "weight": 0.28
+    },
+    {
+      "term": "wayland",
+      "weight": 0.27
+    },
+    {
+      "term": "citation",
+      "weight": 0.26
+    },
+    {
+      "term": "proton",
+      "weight": 0.24
+    },
+    {
+      "term": "sideloading",
+      "weight": 0.23
+    },
+    {
+      "term": "anthropomorphism",
+      "weight": 0.22
+    },
+    {
+      "term": "austria",
+      "weight": 0.21
+    },
+    {
+      "term": "vienna",
+      "weight": 0.2
+    }
+  ]
+}

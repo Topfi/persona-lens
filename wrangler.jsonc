@@ -1,0 +1,20 @@
+{
+  "name": "selbstbild",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-06-01",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*", "/s/*", "/og/*"]
+  },
+  "kv_namespaces": [
+    // Created via: npx wrangler kv namespace create SHARES
+    { "binding": "SHARES", "id": "PLACEHOLDER_KV_ID" }
+  ],
+  "observability": { "enabled": true },
+  "vars": {
+    "MAX_SHARE_BYTES": "262144",
+    "SHARE_TTL_SECONDS": "15552000"
+  }
+}
